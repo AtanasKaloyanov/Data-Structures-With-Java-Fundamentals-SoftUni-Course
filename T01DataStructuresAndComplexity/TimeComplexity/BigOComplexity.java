@@ -11,6 +11,6 @@ public class BigOComplexity {
         return false;
     }
 
-    // O(f(n))
+    // O(n)
 
 }
