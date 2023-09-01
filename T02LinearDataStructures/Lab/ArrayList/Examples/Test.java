@@ -1,4 +1,4 @@
-package T02LinearDataStructures.Lab.ArrayList;
+package T02LinearDataStructures.Lab.ArrayList.Examples;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,5 @@ public class Test {
 
         // int indexOf(Object o)
         System.out.println(numbers.indexOf(4));
-
-
     }
 }

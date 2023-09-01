@@ -18,8 +18,7 @@ public class ArrayList<E> implements List<E> {
             this.elements = grow();
         }
 
-        this.size++;
-        this.elements[this.size] = element;
+        this.elements[this.size++] = element;
 
         return true;
     }

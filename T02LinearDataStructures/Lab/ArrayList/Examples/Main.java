@@ -1,4 +1,4 @@
-package T02LinearDataStructures.Lab.ArrayList;
+package T02LinearDataStructures.Lab.ArrayList.Examples;
 
 
 public class Main {
