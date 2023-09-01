@@ -3,7 +3,6 @@ package T02LinearDataStructures.Lab.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-
 public class ArrayList<E> implements List<E> {
     private static final int DEFAULT_CAPACITY = 4;
     private Object[] elements;
@@ -12,7 +11,6 @@ public class ArrayList<E> implements List<E> {
     public ArrayList() {
         this.elements = new Object[DEFAULT_CAPACITY];
     }
-
 
     @Override
     public boolean add(E element) {
@@ -49,30 +47,16 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public E remove(int index) {
-        this.checkIndex(index);
-        E element = this.getElement(index);
+       checkIndex(index);
+       E element = this.getElement(index);
 
-        this.elements[index] = null;
-        this.size--;
-        shift(index);
+       this.elements[index] = null;
+       this.size--;
 
-        /*
- for (int i = index; i < this.size; i++) {
-         this.elements[i] = this.elements[i + 1];
-     }
+       shift(index);
+       ensureCapacity();
 
-     this.elements[this.size] = null;
-        */
-
-        ensureCapacity();
-
-        /*
- if (this.size < this.elements.length / 3) {
-            this.elements = shrink();
-        }
-         */
-
-        return element;
+       return element;
     }
 
     @Override
@@ -106,7 +90,19 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new Iterator<E>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return this.index < size();
+            }
+
+            @Override
+            public E next() {
+                return get(index++);
+            }
+        };
     }
 
     private Object[] grow() {
