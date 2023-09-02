@@ -2,7 +2,7 @@ package T02LinearDataStructures.Lab.LinkedList;
 
 import java.util.Iterator;
 
-public class SinglyLinkedList<E> implements LinkedList<E>{
+public class SinglyLinkedList<E> implements LinkedList<E> {
     private Node<E> head;
     private int size;
 
@@ -10,28 +10,77 @@ public class SinglyLinkedList<E> implements LinkedList<E>{
         private Node<E> next;
         private E element;
 
-        Node(E value) {
+        public Node(E value) {
             this.element = value;
         }
     }
+
     @Override
     public void addFirst(E element) {
+        Node<E> newNode = new Node<>(element);
 
+        if (this.head != null) {
+            newNode.next = this.head;
+        }
+
+        this.head = newNode;
+        this.size++;
     }
 
     @Override
     public void addLast(E element) {
+        Node<E> newNode = new Node<>(element);
 
+        if (this.head == null) {
+            this.head = newNode;
+        } else {
+            Node<E> current = this.head;
+            while (current.next != null) {
+                current = current.next;
+            }
+
+            current.next = newNode;
+        }
+        this.size++;
     }
 
     @Override
     public E removeFirst() {
-        return null;
+        ensureNoEmpty();
+        E element = this.head.element;
+
+        if (this.size == 1) {
+            this.head = null;
+        } else {
+            Node<E> newHead = this.head.next;
+            this.head.next = null;
+            this.head = newHead;
+        }
+
+        this.size--;
+        return element;
     }
 
     @Override
     public E removeLast() {
-        return null;
+        ensureNoEmpty();
+        Node<E> current = this.head;
+        Node<E> previous = null;
+        E element;
+
+        while (current.next != null) {
+            previous = current;
+            current = current.next;
+        }
+
+        if (previous == null) {
+            element = removeFirst();
+        } else {
+            element = previous.next.element;
+            previous.next = null;
+        }
+
+        return element;
     }
 
     @Override
@@ -43,7 +92,7 @@ public class SinglyLinkedList<E> implements LinkedList<E>{
     public E getLast() {
         Node<E> current = this.head;
 
-        while(current.next != null) {
+        while (current.next != null) {
             current = current.next;
         }
 
@@ -65,6 +114,7 @@ public class SinglyLinkedList<E> implements LinkedList<E>{
     public Iterator<E> iterator() {
         return new Iterator<E>() {
             private Node<E> current = head;
+
             @Override
             public boolean hasNext() {
                 return this.current != null;
