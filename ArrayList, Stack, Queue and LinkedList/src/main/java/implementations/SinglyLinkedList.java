@@ -33,7 +33,20 @@ public class SinglyLinkedList<E> implements LinkedList<E> {
 
     @Override
     public void addLast(E element) {
+        Node<E> newNode = new Node<>(element);
 
+           if (this.size == 0) {
+               this.head = newNode;
+           } else {
+               Node<E> current =  this.head;
+               while(current.next != null) {
+                   current = current.next;
+               }
+
+               current.next = newNode;
+           }
+
+           this.size++;
     }
 
     @Override
@@ -51,7 +64,45 @@ public class SinglyLinkedList<E> implements LinkedList<E> {
     @Override
     public E removeLast() {
         ensureNotEmpty();
-        return null;
+        E element;
+
+        if (this.size == 1) {
+            element = this.head.element;
+            this.head = null;
+        } else {
+            Node<E> previous = null;
+            Node<E> current = this.head;
+
+            while (current.next != null) {
+                previous = current;
+                current = current.next;
+            }
+
+            element = current.element;
+            previous.next = null;
+        }
+
+        this.size--;
+        return element;
+
+//        ensureNotEmpty();
+//        Node<E> current = this.head;
+//        Node<E> previous = null;
+//        E element;
+//
+//        while (current.next != null) {
+//            previous = current;
+//            current = current.next;
+//        }
+//
+//        if (previous == null) {
+//            element = removeFirst();
+//        } else {
+//            element = previous.next.element;
+//            previous.next = null;
+//        }
+//
+//        return element;
     }
 
     @Override
@@ -63,7 +114,21 @@ public class SinglyLinkedList<E> implements LinkedList<E> {
     @Override
     public E getLast() {
         ensureNotEmpty();
-        return null;
+        E element;
+
+        if (this.size == 1) {
+            element = this.head.element;
+        } else {
+            Node<E> current = this.head;
+
+            while(current.next != null) {
+                current = current.next;
+            }
+
+            element = current.element;
+        }
+
+        return element;
     }
 
     @Override
