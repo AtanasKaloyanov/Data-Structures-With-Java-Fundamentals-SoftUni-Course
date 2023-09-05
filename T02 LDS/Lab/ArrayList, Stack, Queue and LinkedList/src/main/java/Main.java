@@ -9,6 +9,5 @@ public class Main {
         AbstractStack<Integer> stack = new Stack<>();
         stack.size();
 
-
     }
 }
