@@ -43,6 +43,7 @@ public class Queue<E> implements AbstractQueue<E> {
             this.head.next = null;
             this.head = next;
         }
+
         this.size--;
         return element;
     }
