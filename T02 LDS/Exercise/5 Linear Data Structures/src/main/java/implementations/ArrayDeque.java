@@ -197,14 +197,11 @@ public class ArrayDeque<E> implements Deque<E> {
             @Override
             public boolean hasNext() {
                 return index <= tail;
-                // return index != tail
             }
 
             @Override
             public E next() {
                 return getAt(index++);
-                // get(index++);
-
             }
         };
     }
