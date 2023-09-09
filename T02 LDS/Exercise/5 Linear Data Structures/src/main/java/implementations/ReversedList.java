@@ -43,12 +43,11 @@ public class ReversedList<E> implements AbstractReversedList<E> {
     @Override
     public E removeAt(int index) {
         ensureIndex(index);
-        int realIndex = this.size - 1 - index;
+//        int realIndex = this.size - 1 - index;
+        int realIndex = index;
         E element = getAt(realIndex);
-        this.elements[realIndex] = null;
         shiftTo(realIndex);
         this.size--;
-
         return element;
     }
 
