@@ -16,11 +16,43 @@ public class TheMatrix {
     }
 
     public void solve() {
-        // TODO: Implement
+        fillMatrix(this.startRow, this.startCol);
     }
 
+    private void fillMatrix(int startRow, int startCol) {
+        if (this.matrix[startRow][startCol] != this.toBeReplaced) {
+            return;
+        }
+
+        this.matrix[startRow][startCol] = this.fillChar;
+
+        if (startRow - 1 >= 0) {
+            fillMatrix(startRow - 1, startCol);
+        }
+
+        if (startRow + 1 < this.matrix.length) {
+            fillMatrix(startRow + 1, startCol);
+        }
+
+        if (startCol - 1 >= 0) {
+            fillMatrix(startRow, startCol - 1);
+        }
+
+        if (startCol + 1 < this.matrix[startRow].length) {
+            fillMatrix(startRow, startCol + 1);
+        }
+    }
+
+
     public String toOutputString() {
-        // TODO: Implement
-        return null;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j < this.matrix[i].length; j++) {
+                sb.append(matrix[i][j]);
+            }
+            sb.append(System.lineSeparator());
+        }
+        return sb.toString().trim();
     }
 }
