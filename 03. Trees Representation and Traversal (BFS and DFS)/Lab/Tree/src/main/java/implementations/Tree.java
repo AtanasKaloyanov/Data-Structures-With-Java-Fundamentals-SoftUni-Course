@@ -22,10 +22,14 @@ public class Tree<E> implements AbstractTree<E> {
         }
     }
 
-
     @Override
     public List<E> orderBfs() {
         List<E> result = new ArrayList<>();
+
+        if (this.key == null) {
+            return result;
+        }
+
         ArrayDeque<Tree<E>> queue = new ArrayDeque<>();
 
         result.add(this.key);
@@ -41,6 +45,7 @@ public class Tree<E> implements AbstractTree<E> {
         }
 
         return result;
+
     }
 
     //                                                        7
@@ -72,7 +77,17 @@ public class Tree<E> implements AbstractTree<E> {
         }
 
         Tree<E> parent = treeForRemoving.parent;
-        parent.children.remove(treeForRemoving);
+        if (parent != null) {
+            parent.children.remove(treeForRemoving);
+        }
+
+        for (Tree<E> currentChild : treeForRemoving.children) {
+            currentChild.parent = null;
+        }
+
+        treeForRemoving.children.clear();
+        treeForRemoving.key = null;
+
     }
 
     @Override
@@ -80,19 +95,35 @@ public class Tree<E> implements AbstractTree<E> {
         Tree<E> firstTree = findTree(firstKey);
         Tree<E> secondTree = findTree(secondKey);
 
+        if (firstTree == null || secondTree == null) {
+            throw new IllegalArgumentException();
+        }
+
         Tree<E> firstParent = firstTree.parent;
         Tree<E> secondParent = secondTree.parent;
 
-        firstTree.parent = secondParent;
-        secondTree.parent = firstParent;
+        if (firstParent == null) {
+            rootSwap(secondTree);
+            return;
+        } else if (secondParent == null){
+            rootSwap(firstTree);
+            return;
+        }
 
         int firstIndex = firstParent.children.indexOf(firstTree);
         int secondIndex = secondParent.children.indexOf(secondTree);
 
+        firstTree.parent = secondParent;
+        secondTree.parent = firstParent;
+
         firstParent.children.set(firstIndex, secondTree);
         secondParent.children.set(secondIndex, firstTree);
+    }
 
-
+    private void rootSwap(Tree<E> anotherTree) {
+        this.key = anotherTree.key;
+        this.children = anotherTree.children;
+        this.parent = null;
     }
 
     private void dfsRecursion(Tree<E> tree, List<E> result) {
@@ -104,7 +135,6 @@ public class Tree<E> implements AbstractTree<E> {
     }
 
     private Tree<E> findTree(E parentKey) {
-        Tree<E> searched = null;
 
         Deque<Tree<E>> deque = new ArrayDeque<>();
         deque.offer(this);
@@ -113,8 +143,7 @@ public class Tree<E> implements AbstractTree<E> {
             Tree<E> firstTree = deque.poll();
 
             if (firstTree.key.equals(parentKey)) {
-                searched = firstTree;
-                break;
+                return firstTree;
             }
 
             for (Tree<E> currentTree : firstTree.children) {
@@ -123,7 +152,7 @@ public class Tree<E> implements AbstractTree<E> {
 
         }
 
-        return searched;
+        return null;
     }
 
 }

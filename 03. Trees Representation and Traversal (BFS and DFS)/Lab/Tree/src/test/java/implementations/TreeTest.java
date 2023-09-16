@@ -26,6 +26,9 @@ public class TreeTest {
         );
     }
 
+
+
+
     @Test
     public void testTreeConstructor() {
         assertNotNull(tree);
@@ -39,6 +42,8 @@ public class TreeTest {
             assertEquals(expected[index++], num);
         }
     }
+
+
 
     @Test
     public void testTreeDfs() {
