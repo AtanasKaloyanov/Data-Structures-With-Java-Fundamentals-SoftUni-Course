@@ -99,41 +99,68 @@ public class Tree<E> implements AbstractTree<E> {
 
     @Override
     public Tree<E> getDeepestLeftmostNode() {
-        List<Tree<E>> deepestLeftMostNode = new ArrayList<>();
+        List<Tree<E>> result = new ArrayList<>();
         int[] maxPath = new int[1];
 
-        deepestLeftMostNode.add(new Tree<>());
+        result.add(new Tree<>());
 
         int max = 0;
-        findDeepestNodeDFS(deepestLeftMostNode, maxPath, max, this);
-        return deepestLeftMostNode.get(0);
-    }
-
-    private void findDeepestNodeDFS(List<Tree<E>> deepestLeftMostNode, int[] maxPath, int max, Tree<E> tree) {
-        if (max > maxPath[0]) {
-            maxPath[0] = max;
-            deepestLeftMostNode.set(0, tree);
-        }
-
-        for (Tree<E> current : tree.children) {
-            findDeepestNodeDFS(deepestLeftMostNode, maxPath, max + 1, current);
-        }
-
+        findDeepestNodeDFS(result, maxPath, max, this);
+        return result.get(0);
     }
 
     @Override
     public List<E> getLongestPath() {
-        return null;
+        Tree<E> deepestTree = getDeepestLeftmostNode();
+        return findPath(deepestTree);
     }
 
     @Override
     public List<List<E>> pathsWithGivenSum(int sum) {
-        return null;
+        List<Tree<E>> leafs = getTreesDFS(this)
+                .stream()
+                .filter( (tree) -> tree.children.size() == 0)
+                .collect(Collectors.toList());
+
+        List<List<E>> result = new ArrayList<>();
+
+        for (Tree<E> currentLeaf : leafs) {
+            List<E> currentLeafPath = findPath(currentLeaf);
+
+            int currentSum = currentLeafPath
+                    .stream()
+                    .map( (E) -> (Integer) E)
+                    .mapToInt( (element) -> element.intValue())
+                    .sum();
+
+            if (currentSum == sum) {
+                result.add(currentLeafPath);
+            }
+
+        }
+
+        return result;
     }
 
     @Override
     public List<Tree<E>> subTreesWithGivenSum(int sum) {
-        return null;
+        List<Tree<E>> subtreeRoots = new ArrayList<>();
+        getSubtreeRootWithSum(this, sum, subtreeRoots);
+        return subtreeRoots;
+
+    }
+
+    private int getSubtreeRootWithSum(Tree<E> current, int targetSum, List<Tree<E>> result) {
+        int currentSum = (int) current.key;
+
+        for (Tree<E> child : current.children) {
+            currentSum += getSubtreeRootWithSum(child, targetSum, result);
+        }
+
+        if (currentSum == targetSum) {
+            result.add(current);
+        }
+        return currentSum;
     }
 
     private void dfsReccursion(Tree<E> tree, StringBuilder sb, int counter) {
@@ -181,6 +208,29 @@ public class Tree<E> implements AbstractTree<E> {
         }
 
         return result;
+    }
+
+    private void findDeepestNodeDFS(List<Tree<E>> result, int[] maxPath, int max, Tree<E> tree) {
+        if (max > maxPath[0]) {
+            maxPath[0] = max;
+            result.set(0, tree);
+        }
+
+        for (Tree<E> current : tree.children) {
+            findDeepestNodeDFS(result, maxPath, max + 1, current);
+        }
+
+    }
+
+    private List<E> findPath(Tree<E> deepestTree) {
+        Deque<E> result = new ArrayDeque<>();
+
+        while (deepestTree != null) {
+            result.push(deepestTree.key);
+            deepestTree = deepestTree.parent;
+        }
+
+        return new ArrayList<>(result);
     }
 }
 
