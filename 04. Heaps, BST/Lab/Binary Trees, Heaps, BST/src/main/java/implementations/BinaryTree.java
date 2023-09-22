@@ -2,14 +2,16 @@ package implementations;
 
 import interfaces.AbstractBinaryTree;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 public class BinaryTree<E> implements AbstractBinaryTree<E> {
     private E key;
-    private AbstractBinaryTree<E> left;
-    private AbstractBinaryTree<E> right;
+    private BinaryTree<E> left;
+    private BinaryTree<E> right;
 
     public BinaryTree(E key, BinaryTree<E> left, BinaryTree<E> right) {
         this.key = key;
@@ -17,14 +19,9 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
         this.right = right;
     }
 
-    public BinaryTree() {
-
-    }
-
-
     @Override
     public E getKey() {
-        return key;
+        return this.key;
     }
 
     @Override
@@ -44,63 +41,143 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
 
     @Override
     public String asIndentedPreOrder(int indent) {
-        String padding = createPadding(indent) + this.getKey();
-        if (this.getLeft() != null) {
-            padding += "\r\n" + this.getLeft().asIndentedPreOrder(indent + 2);
-        }
-        if (this.getRight() != null) {
-            padding += "\r\n" + this.getRight().asIndentedPreOrder(indent + 2);
-        }
-        return padding;
+        StringBuilder result = new StringBuilder();
+        result.append(this.key).append(System.lineSeparator());
+
+        appending(this.left, result, indent);
+        appending(this.right, result, indent);
+
+        return result.toString().trim();
+
+        //                     17
+
+        //         9                        25
+        //
+        //    3         11             20         31
+
+        /*
+        17
+          9
+            3
+            11
+          25
+            20
+            31
+         */
     }
 
-    private String createPadding(int indent) {
-        StringBuilder builder = new StringBuilder();
+    private void appending(BinaryTree<E> tree, StringBuilder result, int indent) {
+        Queue<BinaryTree<E>> queue = new ArrayDeque<>();
+        queue.offer(tree);
 
-        for (int i = 0; i < indent; i++) {
-            builder.append(" ");
+        int counter = 1;
+
+        while (!queue.isEmpty()) {
+            BinaryTree<E> current = queue.poll();
+
+            if (counter % 2 == 0) {
+                indent++;
+            }
+
+            for (int i = 0; i <= indent; i++) {
+                result.append("  ");
+            }
+
+            counter++;
+
+            result.append(current.key);
+            result.append(System.lineSeparator());
+
+            if (current.left != null) {
+                queue.offer(current.left);
+            }
+
+            if (current.right != null) {
+                queue.offer(current.right);
+            }
         }
-
-        return builder.toString();
     }
 
     @Override
     public List<AbstractBinaryTree<E>> preOrder() {
-        List<AbstractBinaryTree<E>> trees = new ArrayList<>();
-        trees.add(this);
-        if (this.getLeft() != null) {
-            trees.addAll(this.getLeft().preOrder());
-        }
-        if (this.getRight() != null) {
-            trees.addAll(this.getRight().preOrder());
-        }
-        return trees;
+        List<AbstractBinaryTree<E>> result = new ArrayList<>();
+
+        preOrderRecc(this, result);
+
+        return result;
     }
+
+    private void preOrderRecc(BinaryTree<E> root, List<AbstractBinaryTree<E>> result) {
+        if (root == null) {
+            return;
+        }
+
+        result.add(root);
+
+        BinaryTree<E> left = root.left;
+        preOrderRecc(left, result);
+        BinaryTree<E> right = root.right;
+        preOrderRecc(right, result);
+    }
+
+    //                     17
+
+    //         9                        25
+    //
+    //    3         11             20         31
+
+
+       // 17, 9, 3, 11, 25, 20, 31
 
     @Override
     public List<AbstractBinaryTree<E>> inOrder() {
-        List<AbstractBinaryTree<E>> trees = new ArrayList<>();
-        if (this.getLeft() != null) {
-            trees.addAll(this.getLeft().inOrder());
-        }
-        trees.add(this);
-        if (this.getRight() != null) {
-            trees.addAll(this.getRight().inOrder());
-        }
-        return trees;
+        List<AbstractBinaryTree<E>> result = new ArrayList<>();
+        inOrderRecc(this, result);
+        return result;
     }
+
+    private void inOrderRecc(BinaryTree<E> current, List<AbstractBinaryTree<E>> result) {
+        if (current == null) {
+            return;
+        }
+
+        BinaryTree<E> left = current.left;
+        inOrderRecc(left, result);
+        result.add(current);
+
+        BinaryTree<E> right = current.right;
+        inOrderRecc(right, result);
+    }
+
+    //                     17
+
+    //         9                        25
+    //
+    //    3         11             20         31
+
+
+    // 3, 9, 11, 17, 20, 25, 31
+
 
     @Override
     public List<AbstractBinaryTree<E>> postOrder() {
-        List<AbstractBinaryTree<E>> trees = new ArrayList<>();
-        if (this.getLeft() != null) {
-            trees.addAll(this.getLeft().postOrder());
+        List<AbstractBinaryTree<E>> result = new ArrayList<>();
+        postOrderRecc(this, result);
+        return result;
+    }
+
+    private void postOrderRecc(BinaryTree<E> current, List<AbstractBinaryTree<E>> result) {
+        if (current == null) {
+            return;
         }
-        if (this.getRight() != null) {
-            trees.addAll(this.getRight().postOrder());
-        }
-        trees.add(this);
-        return trees;
+
+        BinaryTree<E> left = current.left;
+        postOrderRecc(left, result);
+
+        BinaryTree<E> right = current.right;
+        postOrderRecc(right, result);
+
+        result.add(current);
     }
 
     @Override
@@ -108,9 +185,12 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
         if (this.getLeft() != null) {
             this.getLeft().forEachInOrder(consumer);
         }
+
         consumer.accept(this.getKey());
+
         if (this.getRight() != null) {
             this.getRight().forEachInOrder(consumer);
         }
+
     }
 }

@@ -15,11 +15,14 @@ public class BinaryTreeTest {
     @Before
     public void setUp() {
         this.tree = new BinaryTree<>(17,
-                new BinaryTree<>(9, new BinaryTree<>(3, null, null),
+                new BinaryTree<>(9,
+                        new BinaryTree<>(3, null, null),
                         new BinaryTree<>(11, null, null)),
-                new BinaryTree<>(25, new BinaryTree<>(20, null, null),
+                new BinaryTree<>(25,
+                        new BinaryTree<>(20, null, null),
                         new BinaryTree<>(31, null, null))
         );
+
     }
 
     @Test
@@ -27,12 +30,12 @@ public class BinaryTreeTest {
         String indentedPreOrder = this.tree.asIndentedPreOrder(0);
         assertEquals(
                 "17\r\n" +
-                "  9\r\n" +
-                "    3\r\n" +
-                "    11\r\n" +
-                "  25\r\n" +
-                "    20\r\n" +
-                "    31", indentedPreOrder);
+                        "  9\r\n" +
+                        "    3\r\n" +
+                        "    11\r\n" +
+                        "  25\r\n" +
+                        "    20\r\n" +
+                        "    31", indentedPreOrder);
     }
 
     @Test
