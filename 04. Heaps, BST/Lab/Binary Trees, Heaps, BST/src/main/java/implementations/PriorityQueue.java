@@ -79,7 +79,7 @@ public class PriorityQueue<E extends Comparable<E>> implements AbstractQueue<E> 
             index = child;
         }
     }
-    
+
     private void ensureNotEmpty() {
         if (this.size() == 0) {
             throw new IllegalStateException("The collection is empty.");
