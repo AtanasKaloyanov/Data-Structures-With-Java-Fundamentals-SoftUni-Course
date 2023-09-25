@@ -98,6 +98,28 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
         }
     }
 
+    //    @Override
+    //    public String asIndentedPreOrder(int indent) {
+    //        String padding = createPadding(indent) + this.getKey();
+    //        if (this.getLeft() != null) {
+    //            padding += "\r\n" + this.getLeft().asIndentedPreOrder(indent + 2);
+    //        }
+    //        if (this.getRight() != null) {
+    //            padding += "\r\n" + this.getRight().asIndentedPreOrder(indent + 2);
+    //        }
+    //        return padding;
+    //    }
+    //
+    //    private String createPadding(int indent) {
+    //        StringBuilder builder = new StringBuilder();
+    //
+    //        for (int i = 0; i < indent; i++) {
+    //            builder.append(" ");
+    //        }
+    //
+    //        return builder.toString();
+    //    }
+
     @Override
     public List<AbstractBinaryTree<E>> preOrder() {
         List<AbstractBinaryTree<E>> result = new ArrayList<>();
