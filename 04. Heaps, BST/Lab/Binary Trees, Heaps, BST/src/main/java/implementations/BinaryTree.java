@@ -39,86 +39,84 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
         this.key = key;
     }
 
+//    @Override
+//    public String asIndentedPreOrder(int indent) {
+//        StringBuilder result = new StringBuilder();
+//        result.append(this.key).append(System.lineSeparator());
+//
+//        appending(this.left, result, indent);
+//        appending(this.right, result, indent);
+//
+//        return result.toString().trim();
+//    }
+//
+//    private void appending(BinaryTree<E> tree, StringBuilder result, int indent) {
+//        Queue<BinaryTree<E>> queue = new ArrayDeque<>();
+//        queue.offer(tree);
+//
+//        int counter = 1;
+//
+//        while (!queue.isEmpty()) {
+//            BinaryTree<E> current = queue.poll();
+//
+//            if (counter % 2 == 0) {
+//                indent++;
+//            }
+//
+//            for (int i = 0; i <= indent; i++) {
+//                result.append("  ");
+//            }
+//
+//            counter++;
+//
+//            result.append(current.key);
+//            result.append(System.lineSeparator());
+//
+//            if (current.left != null) {
+//                queue.offer(current.left);
+//            }
+//
+//            if (current.right != null) {
+//                queue.offer(current.right);
+//            }
+//        }
+//    }
+
+    //                     17
+
+    //         9                        25
+    //
+    //    3         11             20         31
+
     @Override
     public String asIndentedPreOrder(int indent) {
         StringBuilder result = new StringBuilder();
-        result.append(this.key).append(System.lineSeparator());
 
-        appending(this.left, result, indent);
-        appending(this.right, result, indent);
+        String padding = createPadding(indent) + this.getKey();
+        result.append(padding);
 
-        return result.toString().trim();
-
-        //                     17
-
-        //         9                        25
-        //
-        //    3         11             20         31
-
-        /*
-        17
-          9
-            3
-            11
-          25
-            20
-            31
-         */
-    }
-
-    private void appending(BinaryTree<E> tree, StringBuilder result, int indent) {
-        Queue<BinaryTree<E>> queue = new ArrayDeque<>();
-        queue.offer(tree);
-
-        int counter = 1;
-
-        while (!queue.isEmpty()) {
-            BinaryTree<E> current = queue.poll();
-
-            if (counter % 2 == 0) {
-                indent++;
-            }
-
-            for (int i = 0; i <= indent; i++) {
-                result.append("  ");
-            }
-
-            counter++;
-
-            result.append(current.key);
-            result.append(System.lineSeparator());
-
-            if (current.left != null) {
-                queue.offer(current.left);
-            }
-
-            if (current.right != null) {
-                queue.offer(current.right);
-            }
+        if (this.getLeft() != null) {
+            String preOrder = this.getLeft().asIndentedPreOrder(indent + 2);
+            result.append(System.lineSeparator()).append(preOrder);
         }
+
+        if (this.getRight() != null) {
+            String preOrder = this.getRight().asIndentedPreOrder(indent + 2);
+            result.append(System.lineSeparator()).append(preOrder);
+        }
+
+        return result.toString();
     }
 
-    //    @Override
-    //    public String asIndentedPreOrder(int indent) {
-    //        String padding = createPadding(indent) + this.getKey();
-    //        if (this.getLeft() != null) {
-    //            padding += "\r\n" + this.getLeft().asIndentedPreOrder(indent + 2);
-    //        }
-    //        if (this.getRight() != null) {
-    //            padding += "\r\n" + this.getRight().asIndentedPreOrder(indent + 2);
-    //        }
-    //        return padding;
-    //    }
-    //
-    //    private String createPadding(int indent) {
-    //        StringBuilder builder = new StringBuilder();
-    //
-    //        for (int i = 0; i < indent; i++) {
-    //            builder.append(" ");
-    //        }
-    //
-    //        return builder.toString();
-    //    }
+    private String createPadding(int indent) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < indent; i++) {
+            builder.append(" ");
+        }
+
+        return builder.toString();
+    }
 
     @Override
     public List<AbstractBinaryTree<E>> preOrder() {
@@ -149,7 +147,7 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
     //    3         11             20         31
 
 
-       // 17, 9, 3, 11, 25, 20, 31
+    // 17, 9, 3, 11, 25, 20, 31
 
     @Override
     public List<AbstractBinaryTree<E>> inOrder() {
