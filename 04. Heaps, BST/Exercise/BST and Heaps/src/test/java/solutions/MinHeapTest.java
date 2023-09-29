@@ -49,4 +49,12 @@ public class MinHeapTest {
 
         assertEquals(2, heap.peek().getPrice());
     }
+
+    @Test
+    public void testHeapifyDown() {
+        this.minHeap.poll();
+        assertEquals(6, minHeap.peek().getPrice());
+        this.minHeap.poll();
+        assertEquals(8, minHeap.peek().getPrice());
+    }
 }
