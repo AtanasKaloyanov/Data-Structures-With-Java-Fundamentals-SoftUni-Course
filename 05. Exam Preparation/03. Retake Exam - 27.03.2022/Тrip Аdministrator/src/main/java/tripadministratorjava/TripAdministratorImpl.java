@@ -4,108 +4,122 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TripAdministratorImpl implements TripAdministrator {
-    private Map<String, Company> companiesByNames;
-    private Map<String, Trip> tripsByIds;
-    private Map<String, List<Trip>> companiesWithTrips;
+    private Map<String, Company> companiesByName;
+    private Map<String, Trip> tripsById;
+    private Map<String, List<Trip>> companyTrps;
+
 
     public TripAdministratorImpl() {
-        this.companiesByNames = new LinkedHashMap<>();
-        this.tripsByIds = new LinkedHashMap<>();
-        this.companiesWithTrips = new LinkedHashMap<>();
+        this.companiesByName = new HashMap<>();
+        this.tripsById = new HashMap<>();
+        this.companyTrps = new HashMap<>();
     }
 
+    // +
     @Override
     public void addCompany(Company c) {
-        if (companiesByNames.containsKey(c.name)) {
+        if (this.companiesByName.containsKey(c.name)) {
             throw new IllegalArgumentException();
         }
 
-        this.companiesByNames.put(c.name, c);
-        this.companiesWithTrips.put(c.name, new ArrayList<>());
+        this.companiesByName.put(c.name, c);
+
+        // adding the company in the map with the trips too
+        this.companyTrps.put(c.name, new ArrayList<>());
     }
 
     @Override
     public void addTrip(Company c, Trip t) {
-        if (!this.companiesByNames.containsKey(c.name) || exist(t)) {
+        // We should throw an exception when the trip exist in the map tripsById
+        if (!exist(c) || exist(t)) {
             throw new IllegalArgumentException();
         }
 
-        this.tripsByIds.put(t.id, t);
+        this.tripsById.put(t.id, t);
 
-        if (c.tripOrganizationLimit == companiesWithTrips.get(c.name).size()) {
+        // when the number of the trips is equal to the limit, we should throw
+        // an exception, becaus of the full capacity
+        if (c.tripOrganizationLimit == this.companyTrps.get(c.name).size()) {
             throw new IllegalArgumentException();
         }
 
-        this.companiesWithTrips.get(c.name).add(t);
+        this.companyTrps.get(c.name).add(t);
     }
 
     @Override
     public boolean exist(Company c) {
-        return this.companiesByNames.containsKey(c.name);
+        return this.companiesByName.containsKey(c.name);
     }
 
     @Override
     public boolean exist(Trip t) {
-        return this.tripsByIds.containsKey(t.id);
+        return this.tripsById.containsKey(t.id);
     }
 
     @Override
     public void removeCompany(Company c) {
-        if (!companiesByNames.containsKey(c.name)) {
+        if (!this.companiesByName.containsKey(c.name)) {
             throw new IllegalArgumentException();
         }
 
-        this.companiesByNames.remove(c.name);
-        List<Trip> trips = companiesWithTrips.remove(c.name);
-        trips.forEach(trip -> tripsByIds.remove(trip.id));
+        this.companiesByName.remove(c.name);
+        // After the removing of the trips by the company name in the map companyTrips,
+        // we should remove this trips from the map tripsById.
+        // This can be done when we assign this trips by a variable (the remove method in the
+        // map returns the )
+        List<Trip> trips = this.companyTrps.remove(c.name);
+        trips.forEach( (trip) -> this.tripsById.remove(trip.id));
     }
 
     @Override
     public Collection<Company> getCompanies() {
-        return this.companiesByNames.values();
+        return this.companiesByName.values();
     }
 
     @Override
     public Collection<Trip> getTrips() {
-        return this.tripsByIds.values();
+        return this.tripsById.values();
     }
 
     @Override
     public void executeTrip(Company c, Trip t) {
-        if (!exist(c) || !exist(c)) {
+        if (!exist(t) || !(exist(c))) {
             throw new IllegalArgumentException();
         }
 
-        List<Trip> companyTrips = this.companiesWithTrips.get(c.name);
-
-        boolean removed = companyTrips.removeIf(tr -> tr.id.equals(t.id));
-
-        if (!removed) {
+        if (!this.companyTrps.get(c.name).contains(t)) {
             throw new IllegalArgumentException();
         }
 
-        this.tripsByIds.remove(t.id);
+        this.companyTrps.get(c.name).remove(t);
+        this.tripsById.remove(t.id);
     }
 
     @Override
     public Collection<Company> getCompaniesWithMoreThatNTrips(int n) {
-        return getCompanies().stream()
-                .filter(c -> companiesWithTrips.get(c.name).size() > n)
+        return this.companiesByName.values()
+                .stream()
+                .filter((company) -> {
+                    List<Trip> currentTrips = this.companyTrps.get(company.name);
+
+                    return currentTrips.size() > n;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<Trip> getTripsWithTransportationType(Transportation t) {
-        return getTrips().stream()
-                .filter(trip -> trip.transportation == t)
+        return this.tripsById.values()
+                .stream()
+                .filter((trip) -> trip.transportation.equals(t))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<Trip> getAllTripsInPriceRange(int lo, int hi) {
-        return getTrips().stream()
-                .filter(trip -> trip.price >= lo && trip.price <= hi)
+        return this.tripsById.values()
+                .stream()
+                .filter((trip) -> trip.price >= lo && trip.price <= hi)
                 .collect(Collectors.toList());
     }
-
 }

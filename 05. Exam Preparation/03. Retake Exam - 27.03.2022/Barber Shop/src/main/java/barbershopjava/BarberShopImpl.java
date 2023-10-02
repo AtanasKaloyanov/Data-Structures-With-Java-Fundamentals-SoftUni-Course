@@ -4,111 +4,124 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BarberShopImpl implements BarberShop {
-    private Map<String, Barber> barbersByNames;
-    private Map<String, Client> clientsByNames;
-    private Map<String, List<Client>> barberWithClients;
-//    private List<Barber> barbers;
-//    private List<Client> clients;
+    private Map<String, Barber> barbersByName;
+    private Map<String, Client> clientsByName;
+
+    // Map key String name and List<Client>
+    private Map<String, List<Client>> barberClients;
 
     public BarberShopImpl() {
-        this.barbersByNames = new HashMap<>();
-        this.clientsByNames = new HashMap<>();
-        this.barberWithClients = new HashMap<>();
-//        this.barbers = new ArrayList<>();
-//        this.clients = new ArrayList<>();
+        this.barbersByName = new HashMap<>();
+        this.clientsByName = new HashMap<>();
+        this.barberClients = new HashMap<>();
     }
 
     @Override
     public void addBarber(Barber b) {
-        if (this.barbersByNames.containsKey(b.name)) {
+        if (this.barbersByName.containsKey(b.name)) {
             throw new IllegalArgumentException();
         }
 
-        this.barbersByNames.put(b.name, b);
-        this.barberWithClients.put(b.name, new ArrayList<>());
-//        this.barbers.add(b);
+        this.barbersByName.put(b.name, b);
+        this.barberClients.put(b.name, new ArrayList<>());
     }
 
     @Override
     public void addClient(Client c) {
-        if (this.clientsByNames.containsKey(c.name)) {
+        if (this.clientsByName.containsKey(c.name)) {
             throw new IllegalArgumentException();
         }
 
-        this.clientsByNames.put(c.name, c);
-//        this.clients.add(c);
+        this.clientsByName.put(c.name, c);
     }
 
     @Override
     public boolean exist(Barber b) {
-        return this.barbersByNames.containsKey(b.name);
+        return this.barbersByName.containsKey(b.name);
     }
 
     @Override
     public boolean exist(Client c) {
-        return this.clientsByNames.containsKey(c.name);
+        return this.clientsByName.containsKey(c.name);
     }
 
     @Override
     public Collection<Barber> getBarbers() {
-        return this.barbersByNames.values();
+        return this.barbersByName.values();
     }
 
     @Override
     public Collection<Client> getClients() {
-        return this.clientsByNames.values();
+        return this.clientsByName.values();
     }
 
     @Override
     public void assignClient(Barber b, Client c) {
-        if (!exist(b) || (!exist(c))) {
+        if (!exist(b) || !exist(c)) {
             throw new IllegalArgumentException();
         }
-
+        
+        this.barberClients.get(b.name).add(c);
         c.barber = b;
-        this.barberWithClients.get(b.name).add(c);
     }
 
     @Override
     public void deleteAllClientsFrom(Barber b) {
-        if (!exist(b)) {
+        if (!this.barbersByName.containsKey(b.name)) {
             throw new IllegalArgumentException();
         }
 
-        List<Client> clients = this.barberWithClients.get(b.name);
-        clients.clear();
+        this.barberClients.get(b.name).clear();
     }
 
     @Override
     public Collection<Client> getClientsWithNoBarber() {
-        return getClients()
+        return this.clientsByName
+                .values()
                 .stream()
-                .filter(c -> c.barber == null)
+                .filter( (client) -> client.barber == null)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<Barber> getAllBarbersSortedWithClientsCountDesc() {
-        return getBarbers().stream()
-                .sorted((b1, b2) -> {
+        // Use List, instead Map.
+        // The List will return all barbers (including the barbers without clients).
+        // The Map will rerurn only the barbers, that have clients
 
-                    int firstClients = this.barberWithClients.get(b1.name).size();
-                    int secondClients = this.barberWithClients.get(b2.name).size();
+        // Wrong solution
+//        return this.barberClients
+//                .entrySet()
+//                .stream()
+//                .sorted( (entry1, entry2) -> {
+//                    int firsBarberClientSize = entry1.getValue().size();
+//                    int secondBarberClientsSize = entry2.getValue().size();
+//
+//                    return Integer.compare(secondBarberClientsSize, firsBarberClientSize);
+//                }).map( (entry) -> entry.getKey())
+//                .collect(Collectors.toList());
 
-                    return Integer.compare(secondClients, firstClients);
+        return this.barbersByName.values()
+                .stream()
+                .sorted( (barber1, barber2) -> {
+                    int first = this.barberClients.get(barber1.name).size();
+                    int second = this.barberClients.get(barber2.name).size();
+
+                    return Integer.compare(second, first);
                 })
                 .collect(Collectors.toList());
+
     }
 
     @Override
     public Collection<Barber> getAllBarbersSortedWithStarsDescendingAndHaircutPriceAsc() {
-        return getBarbers()
+        return this.barbersByName.values()
                 .stream()
-                .sorted((first, second) -> {
-                    int result = Integer.compare(second.stars, first.stars);
+                .sorted( (b1, b2) -> {
+                    int result = Integer.compare(b2.stars, b1.stars);
 
                     if (result == 0) {
-                        result = Integer.compare(first.haircutPrice, second.haircutPrice);
+                        result = Integer.compare(b1.haircutPrice, b2.haircutPrice);
                     }
 
                     return result;
@@ -118,18 +131,22 @@ public class BarberShopImpl implements BarberShop {
 
     @Override
     public Collection<Client> getClientsSortedByAgeDescAndBarbersStarsDesc() {
-        return barberWithClients.values()
+        // ! The return should be clients that are assign by barber => We should use the map barberClients
+        // ! We use the function flatmap(List::stream) for mapping the stream of Lists to stream
+
+        return this.barberClients
+                .values()
                 .stream()
                 .flatMap(List::stream)
-                .sorted( (c1, c2) -> {
-                    int result = Integer.compare(c2.age, c1.age);
+                .sorted( (client1, client2) -> {
+                    int result = Integer.compare(client2.age, client1.age);
 
                     if (result == 0) {
-                        result = Integer.compare(c2.barber.stars, c1.barber.stars);
+                        result = Integer.compare(client2.barber.stars, client1.barber.stars);
                     }
 
                     return result;
-                }).collect(Collectors.toList());
-
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -9,4 +9,6 @@ public class Company {
         this.name = name;
         this.tripOrganizationLimit = tripOrganizationLimit;
     }
+
+
 }
