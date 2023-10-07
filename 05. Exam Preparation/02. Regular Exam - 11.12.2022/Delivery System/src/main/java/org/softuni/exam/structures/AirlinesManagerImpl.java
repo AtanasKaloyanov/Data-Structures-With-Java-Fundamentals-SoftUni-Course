@@ -83,14 +83,6 @@ public class AirlinesManagerImpl implements AirlinesManager {
         });
 
         flightsForRemoving.clear();
-        /*
-        List<Flight> removedAirlinesFlight = flightsByAirlinesId.get(airline.getId());
-
-        for (Flight flight : removedAirlinesFlight) {
-            this.flightsById.remove(flight.getId());
-            this.completedFlights.remove(flight.getId());
-        }
-         */
     }
 
     // returning the values of the map getAllFlights
