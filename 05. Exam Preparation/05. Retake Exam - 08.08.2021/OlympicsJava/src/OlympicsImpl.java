@@ -4,20 +4,15 @@ import java.util.stream.Collectors;
 
 public class OlympicsImpl implements Olympics {
     private Map<Integer, Competitor> competitorsById;
-
     private Map<Integer, Competition> competitionsById;
+    private Map<Integer, Competitor> registeredCompetitors;
 
-    // competitionsId         List<Competitor>
-    private Map<Integer, List<Competitor>> competitorsByCompetionsId;
-
-    //   key - competitorsId,   Competitor
-    private Map<Integer, Competitor> registeredCompetitorsById;
+    // TODO: Using Sets
 
     public OlympicsImpl() {
         this.competitorsById = new HashMap<>();
         this.competitionsById = new HashMap<>();
-        this.registeredCompetitorsById = new HashMap<>();
-        this.competitorsByCompetionsId = new HashMap<>();
+        this.registeredCompetitors = new HashMap<>();
     }
 
     @Override
@@ -25,7 +20,6 @@ public class OlympicsImpl implements Olympics {
         if (this.competitorsById.containsKey(id)) {
             throw new IllegalArgumentException();
         }
-
         this.competitorsById.put(id, new Competitor(id, name));
     }
 
@@ -34,8 +28,6 @@ public class OlympicsImpl implements Olympics {
         if (this.competitionsById.containsKey(id)) {
             throw new IllegalArgumentException();
         }
-
-        this.competitorsByCompetionsId.put(id, new ArrayList<>());
         this.competitionsById.put(id, new Competition(name, id, score));
     }
 
@@ -44,14 +36,11 @@ public class OlympicsImpl implements Olympics {
         if (!this.competitorsById.containsKey(competitorId) || !this.competitionsById.containsKey(competitionId)) {
             throw new IllegalArgumentException();
         }
-
         Competitor competitor = this.competitorsById.get(competitorId);
         Competition competition = this.competitionsById.get(competitionId);
         competition.getCompetitors().add(competitor);
-
         competitor.setTotalScore(competitor.getTotalScore() + (long) competition.getScore());
-        this.registeredCompetitorsById.put(competitorId, competitor);
-        this.competitorsByCompetionsId.get(competitionId).add(competitor);
+        this.registeredCompetitors.put(competitorId, competitor);
     }
 
     @Override
@@ -59,16 +48,14 @@ public class OlympicsImpl implements Olympics {
         if (!this.competitorsById.containsKey(competitorId) || !this.competitionsById.containsKey(competitionId)) {
             throw new IllegalArgumentException();
         }
-
         Competitor competitor = this.competitorsById.get(competitorId);
         Competition competition = this.competitionsById.get(competitionId);
-
-        if (!this.competitorsByCompetionsId.containsKey(competitorId)) {
+        if (!competition.getCompetitors().contains(competitor)) {
             throw new IllegalArgumentException();
         }
         competition.getCompetitors().remove(competitor);
+        this.registeredCompetitors.remove(competitor.getId());
         competitor.setTotalScore(competitor.getTotalScore() - (long) competition.getScore());
-        this.registeredCompetitorsById.remove(competitorId);
     }
 
     @Override
@@ -81,20 +68,18 @@ public class OlympicsImpl implements Olympics {
 
     @Override
     public Iterable<Competitor> getByName(String name) {
-
         List<Competitor> comprtitorsWithGivenName = this.competitorsById.values()
                 .stream()
                 .filter((competitor) -> competitor.getName().equals(name))
-                .sorted((c1, c2) -> {
-                    return Integer.compare(c1.getId(), c2.getId());
-                })
                 .collect(Collectors.toList());
-
         if (comprtitorsWithGivenName.isEmpty()) {
             throw new IllegalArgumentException();
         }
-
-        return comprtitorsWithGivenName;
+        return comprtitorsWithGivenName
+                .stream()
+                .sorted( (comp1, comp2) -> {
+                    return Integer.compare(comp1.getId(), comp2.getId());
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -113,8 +98,7 @@ public class OlympicsImpl implements Olympics {
         if (!this.competitionsById.containsKey(competitionId)) {
             throw new IllegalArgumentException();
         }
-
-        return null;
+        return this.competitionsById.get(competitionId).getCompetitors().contains(comp);
     }
 
     @Override
@@ -132,7 +116,6 @@ public class OlympicsImpl implements Olympics {
         if (!this.competitionsById.containsKey(id)) {
             throw new IllegalArgumentException();
         }
-
         return this.competitionsById.get(id);
     }
 }
