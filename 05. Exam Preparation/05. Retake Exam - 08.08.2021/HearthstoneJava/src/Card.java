@@ -1,5 +1,4 @@
 public class Card {
-
     private String name;
     private int score;
     private int damage;
