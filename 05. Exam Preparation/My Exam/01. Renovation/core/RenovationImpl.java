@@ -8,14 +8,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RenovationImpl implements Renovation {
+    // ArrayDeque of Tiles
     private final ArrayDeque<Tile> tiles;
+
+    // we need the totalArea
     private double totalTileArea;
     private final ArrayDeque<Laminate> laminates;
 
     public RenovationImpl() {
         this.tiles = new ArrayDeque<>();
         this.laminates = new ArrayDeque<>();
-
         this.totalTileArea = 0;
     }
 
