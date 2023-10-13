@@ -10,13 +10,15 @@ public class CraftsmanLabImpl implements CraftsmanLab {
     private final Map<String, ApartmentRenovation> apartments;
     private final Map<String, Craftsman> craftsmen;
     private final PriorityQueue<Craftsman> craftsmenByProfit;
-    private final Map<String, Craftsman> apartmentRenovator;
+
+    //         key - apartmentAdress, Craftsman
+    private final Map<String, Craftsman> craftsmenByApartmentAddress;
 
     public CraftsmanLabImpl() {
         this.apartments = new LinkedHashMap<>();
         this.craftsmen = new HashMap<>();
         this.craftsmenByProfit = new PriorityQueue<>(Comparator.comparingDouble(c -> c.totalEarnings));
-        this.apartmentRenovator = new HashMap<>();
+        this.craftsmenByApartmentAddress = new HashMap<>();
     }
 
     @Override
@@ -54,7 +56,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
             throw new IllegalArgumentException();
         }
 
-        if (apartmentRenovator.containsValue(craftsman)) {
+        if (craftsmenByApartmentAddress.containsValue(craftsman)) {
             throw new IllegalArgumentException();
         }
 
@@ -70,26 +72,26 @@ public class CraftsmanLabImpl implements CraftsmanLab {
     @Override
     public void assignRenovations() {
         for (ApartmentRenovation job : apartments.values()) {
-            if (apartmentRenovator.containsKey(job.address)) {
+            if (craftsmenByApartmentAddress.containsKey(job.address)) {
                 continue;
             }
 
-            Craftsman doingRepair = craftsmenByProfit.poll();
+            Craftsman currentCraftsman = craftsmenByProfit.poll();
 
-            doingRepair.totalEarnings += job.workHoursNeeded *  doingRepair.hourlyRate;
+            currentCraftsman.totalEarnings += job.workHoursNeeded *  currentCraftsman.hourlyRate;
 
-            craftsmenByProfit.offer(doingRepair);
-            apartmentRenovator.put(job.address, doingRepair);
+            craftsmenByProfit.offer(currentCraftsman);
+            craftsmenByApartmentAddress.put(job.address, currentCraftsman);
         }
     }
 
     @Override
     public Craftsman getContractor(ApartmentRenovation job) {
-        if (!apartmentRenovator.containsKey(job.address)) {
+        if (!craftsmenByApartmentAddress.containsKey(job.address)) {
             throw new IllegalArgumentException();
         }
 
-        return apartmentRenovator.get(job.address);
+        return craftsmenByApartmentAddress.get(job.address);
     }
 
     @Override
@@ -105,8 +107,8 @@ public class CraftsmanLabImpl implements CraftsmanLab {
     public Collection<ApartmentRenovation> getApartmentsByRenovationCost() {
         return apartments.values().stream()
             .sorted((l, r) -> {
-                Craftsman leftCraftsman = apartmentRenovator.get(l.address);
-                Craftsman rightCraftsman = apartmentRenovator.get(r.address);
+                Craftsman leftCraftsman = craftsmenByApartmentAddress.get(l.address);
+                Craftsman rightCraftsman = craftsmenByApartmentAddress.get(r.address);
 
                 double leftCost = leftCraftsman == null ?
                         l.workHoursNeeded : leftCraftsman.hourlyRate * l.workHoursNeeded;
